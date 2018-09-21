@@ -6,13 +6,8 @@
             [common-client.login.html :as lhtml]
             [common-client.sign-up.controller :as suc]
             [common-client.allowed-actions.controller :as aa]
+            [common-middle.request-urls :as rurls]
             [language-lib.core :refer [cached-labels]]))
-
-(def login-url
-     "/clojure/login")
-
-(def logout-url
-     "/clojure/logout")
 
 (def custom-menu
      (atom nil))
@@ -92,7 +87,7 @@
     cached-labels
     [])
   (let [xhr (sjax
-              {:url "/clojure/set-language"
+              {:url rurls/set-language-url
                :entity evt-p})]
     (.reload
       js/location))
@@ -176,7 +171,7 @@
     (lhtml/form
       {:onclick
         {:evt-fn ajax
-         :evt-p {:url login-url
+         :evt-p {:url rurls/login-url
                  :success-fn login-success
                  :error-fn login-error
                  :entity read-login-form}}
@@ -214,7 +209,7 @@
   "Logout"
   [& optional]
   (ajax
-    {:url logout-url
+    {:url rurls/logout-url
      :success-fn logout-success
      :error-fn logout-error
      :entity {:user "Bye"}}))

@@ -3,10 +3,8 @@
             [utils-lib.core :as utils]
             [framework-lib.core :as frm]
             [js-lib.core :as md]
-            [common-client.sign-up.html :as suh]))
-
-(def sign-up-url
-     "/clojure/sign-up")
+            [common-client.sign-up.html :as suh]
+            [common-middle.request-urls :as rurls]))
 
 (defn sign-up-error
   ""
@@ -48,7 +46,7 @@
                    (= password
                       confirm-password))
             (ajax
-              {:url sign-up-url
+              {:url rurls/sign-up-url
                :success-fn cancel-fn
                :error-fn sign-up-error
                :entity {:entity-type "user"

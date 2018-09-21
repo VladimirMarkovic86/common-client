@@ -25,41 +25,45 @@
    :fields-order [:role-name
                   :functionalities]})
 
-(def columns
-     {:projection [:role-name
-                   ;:functionalities
-                   ]
-      :style
-       {:role-name
-         {:content (get-label 28)
-          :th {:style {:width "200px"}}
-          :td {:style {:width "200px"
-                       :text-align "left"}}
-          }
-        :functionalities
-         {:content (get-label 29)
-          :th {:style {:width "100px"}}
-          :td {:style {:width "100px"
-                       :text-align "left"}}
-          }}
-       })
+(defn columns-fn
+  ""
+  []
+  {:projection [:role-name
+                ;:functionalities
+                ]
+   :style
+    {:role-name
+      {:content (get-label 28)
+       :th {:style {:width "200px"}}
+       :td {:style {:width "200px"
+                    :text-align "left"}}
+       }
+     :functionalities
+      {:content (get-label 29)
+       :th {:style {:width "100px"}}
+       :td {:style {:width "100px"
+                    :text-align "left"}}
+       }}
+    })
 
-(def query
-     {:entity-type entity-type
-      :entity-filter {}
-      :projection (:projection columns)
-      :projection-include true
-      :qsort {:role-name 1}
-      :pagination true
-      :current-page 0
-      :rows 25
-      :collation {:locale "sr"}})
+(defn query-fn
+  ""
+  []
+  {:entity-type entity-type
+   :entity-filter {}
+   :projection (:projection (columns-fn))
+   :projection-include true
+   :qsort {:role-name 1}
+   :pagination true
+   :current-page 0
+   :rows 25
+   :collation {:locale "sr"}})
 
 (defn table-conf-fn
   ""
   []
-  {:query query
-   :columns columns
+  {:query (query-fn)
+   :columns (columns-fn)
    :form-conf (form-conf-fn)
    :actions [:details :edit :delete]
    :allowed-actions @allowed-actions
