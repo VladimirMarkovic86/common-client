@@ -7,7 +7,7 @@
      (atom #{}))
 
 (defn get-allowed-actions
-  ""
+  "Request set of allowed actions for user that is logged in"
   []
   (let [xhr (sjax
               {:url rurls/get-allowed-actions-url})

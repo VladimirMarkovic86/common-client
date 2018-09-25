@@ -7,7 +7,7 @@
             [common-middle.request-urls :as rurls]))
 
 (defn sign-up-error
-  ""
+  "Sign up error function"
   [xhr]
   (let [response (get-response xhr)
         message (:message response)

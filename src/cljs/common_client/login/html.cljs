@@ -154,7 +154,7 @@
  )
 
 (defn language-fn
-  ""
+  "Language select language"
   [change-language-fn
    language-name]
   (div

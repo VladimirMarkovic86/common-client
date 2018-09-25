@@ -7,7 +7,7 @@
      "language")
 
 (defn form-conf-fn
-  ""
+  "Form configuration for language entity"
   []
   {:id :_id
    :type entity-type
@@ -27,7 +27,7 @@
                   :serbian]})
 
 (defn columns-fn
-  ""
+  "Table columns for language entity"
   []
   {:projection [:code
                 :english
@@ -54,7 +54,7 @@
     })
 
 (defn query-fn
-  ""
+  "Table query for language entity"
   []
   {:entity-type entity-type
    :entity-filter {}
@@ -67,7 +67,7 @@
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
-  ""
+  "Table configuration for language entity"
   []
   {:query (query-fn)
    :columns (columns-fn)

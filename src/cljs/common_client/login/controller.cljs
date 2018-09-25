@@ -79,7 +79,7 @@
     1000))
 
 (defn change-language-fn
-  ""
+  "Function that resets cached labels and reads labels for chosen language"
   [evt-p
    element
    event]
@@ -195,7 +195,7 @@
   (redirect-to-login))
 
 (defn logout-error
-  ""
+  "Logout error function"
   [xhr]
   (let [response (get-response xhr)
         message (:message response)

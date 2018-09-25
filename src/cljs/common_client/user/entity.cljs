@@ -35,7 +35,7 @@
     @options))
 
 (defn form-conf-fn
-  ""
+  "Form configuration for user entity"
   []
   {:id :_id
    :type entity-type
@@ -55,7 +55,7 @@
                   :roles]})
 
 (defn columns-fn
-  ""
+  "Table columns for user entity"
   []
   {:projection [:username
                 ;:password
@@ -83,7 +83,7 @@
     })
 
 (defn query-fn
-  ""
+  "Table query for user entity"
   []
   {:entity-type entity-type
    :entity-filter {}
@@ -96,7 +96,7 @@
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
-  ""
+  "Table configuration for user entity"
   []
   {:query (query-fn)
    :columns (columns-fn)

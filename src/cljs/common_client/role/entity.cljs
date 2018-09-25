@@ -10,7 +10,7 @@
      (atom nil))
 
 (defn form-conf-fn
-  ""
+  "Form configuration for role entity"
   []
   {:id :_id
    :type entity-type
@@ -26,7 +26,7 @@
                   :functionalities]})
 
 (defn columns-fn
-  ""
+  "Table columns for role entity"
   []
   {:projection [:role-name
                 ;:functionalities
@@ -47,7 +47,7 @@
     })
 
 (defn query-fn
-  ""
+  "Table query for role entity"
   []
   {:entity-type entity-type
    :entity-filter {}
@@ -60,7 +60,7 @@
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
-  ""
+  "Table configuration for role entity"
   []
   {:query (query-fn)
    :columns (columns-fn)
