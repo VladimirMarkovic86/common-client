@@ -114,6 +114,9 @@
   "Login success"
   [xhr
    ajax-params]
+  (reset!
+    cached-labels
+    [])
   (md/remove-element-content
     ".body")
   (logout-on-session-expired)
