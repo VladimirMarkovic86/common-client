@@ -39,7 +39,7 @@
     (str "session=destroyed; "
          "expires=Thu, 01 Jan 1970 00:00:01 GMT; "))
   (set-cookie
-    (str "long_session=destroyed; "
+    (str "long-session=destroyed; "
          "expires=Thu, 01 Jan 1970 00:00:01 GMT; "))
  )
 
