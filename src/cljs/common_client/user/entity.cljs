@@ -9,7 +9,7 @@
      "user")
 
 (defn get-roles
-  ""
+  "Get roles for logged in user"
   []
   (let [xhr (sjax
               {:url rurls/get-entities-url
