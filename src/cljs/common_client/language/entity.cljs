@@ -1,10 +1,11 @@
 (ns common-client.language.entity
   (:require [framework-lib.core :refer [gen-table]]
             [language-lib.core :refer [get-label]]
-            [common-client.allowed-actions.controller :refer [allowed-actions]]))
+            [common-client.allowed-actions.controller :refer [allowed-actions]]
+            [common-middle.collection-names :refer [language-cname]]))
 
 (def entity-type
-     "language")
+     language-cname)
 
 (defn form-conf-fn
   "Form configuration for language entity"

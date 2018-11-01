@@ -1,10 +1,11 @@
 (ns common-client.role.entity
   (:require [framework-lib.core :refer [gen-table]]
             [language-lib.core :refer [get-label]]
-            [common-client.allowed-actions.controller :refer [allowed-actions]]))
+            [common-client.allowed-actions.controller :refer [allowed-actions]]
+            [common-middle.collection-names :refer [role-cname]]))
 
 (def entity-type
-     "role")
+     role-cname)
 
 (def functionalities
      (atom nil))

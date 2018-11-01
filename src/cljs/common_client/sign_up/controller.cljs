@@ -4,7 +4,8 @@
             [framework-lib.core :as frm]
             [js-lib.core :as md]
             [common-client.sign-up.html :as suh]
-            [common-middle.request-urls :as rurls]))
+            [common-middle.request-urls :as rurls]
+            [common-middle.collection-names :refer [user-cname]]))
 
 (defn sign-up-error
   "Sign up error function"
@@ -49,7 +50,7 @@
               {:url rurls/sign-up-url
                :success-fn cancel-fn
                :error-fn sign-up-error
-               :entity {:entity-type "user"
+               :entity {:entity-type user-cname
                         :entity {:username username
                                  :password (utils/encrypt-password
                                              password)

@@ -3,10 +3,11 @@
             [framework-lib.core :refer [gen-table]]
             [language-lib.core :refer [get-label]]
             [common-middle.request-urls :as rurls]
-            [common-client.allowed-actions.controller :refer [allowed-actions]]))
+            [common-client.allowed-actions.controller :refer [allowed-actions]]
+            [common-middle.collection-names :refer [user-cname]]))
 
 (def entity-type
-     "user")
+     user-cname)
 
 (defn get-roles
   "Get roles for logged in user"
