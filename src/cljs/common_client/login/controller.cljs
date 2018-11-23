@@ -32,17 +32,6 @@
     "cookie"
     cookie-value))
 
-(defn destroy-session-cookie
-  "Destroy session cookie"
-  []
-  (set-cookie
-    (str "session=destroyed; "
-         "expires=Thu, 01 Jan 1970 00:00:01 GMT; "))
-  (set-cookie
-    (str "long-session=destroyed; "
-         "expires=Thu, 01 Jan 1970 00:00:01 GMT; "))
- )
-
 (defn is-session-expired
   "Check if session cookie exists"
   []
@@ -194,7 +183,6 @@
   "Logout success function"
   [xhr]
   (remove-main)
-  (destroy-session-cookie)
   (redirect-to-login))
 
 (defn logout-error
