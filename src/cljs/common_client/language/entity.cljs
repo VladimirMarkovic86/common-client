@@ -15,13 +15,16 @@
    :entity-name (get-label 23)
    :fields {:code {:label (get-label 24)
                    :input-el "number"
-                   :attrs {:required "required"}}
+                   :attrs {:placeholder (get-label 24)
+                           :required true}}
             :english {:label (get-label 25)
                       :input-el "text"
-                      :attrs {:required "required"}}
+                      :attrs {:placeholder (get-label 25)
+                              :required true}}
             :serbian {:label (get-label 26)
                       :input-el "text"
-                      :attrs {:required "required"}}
+                      :attrs {:placeholder (get-label 26)
+                              :required true}}
             }
    :fields-order [:code
                   :english
@@ -36,20 +39,20 @@
    :style
     {:code
       {:content (get-label 24)
-       :th {:style {:width "100px"}}
-       :td {:style {:width "100px"
+       :th {:style {:width "10%"}}
+       :td {:style {:width "10%"
                     :text-align "left"}}
        }
      :english
       {:content (get-label 25)
-       :th {:style {:width "100px"}}
-       :td {:style {:width "100px"
+       :th {:style {:width "30%"}}
+       :td {:style {:width "30%"
                     :text-align "left"}}
        }
      :serbian
       {:content (get-label 26)
-       :th {:style {:width "100px"}}
-       :td {:style {:width "100px"
+       :th {:style {:width "30%"}}
+       :td {:style {:width "30%"
                     :text-align "left"}}
        }}
     })
@@ -64,7 +67,7 @@
    :qsort {:code 1}
    :pagination true
    :current-page 0
-   :rows 25
+   :rows 10
    :collation {:locale "sr"}})
 
 (defn table-conf-fn

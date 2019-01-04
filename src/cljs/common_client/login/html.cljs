@@ -1,180 +1,192 @@
 (ns common-client.login.html
-  (:require [htmlcss-lib.core :refer [gen table tr td label
-                                      input div a nav]]
+  (:require [htmlcss-lib.core :refer [gen label input div nav header
+                                      footer section aside fieldset
+                                      form h2 p span]]
             [js-lib.core :as md]
             [framework-lib.core :refer [popup-fn]]
-            [common-client.user.controller :as uc]
-            [common-client.language.controller :as lc]
-            [common-client.role.controller :as rc]
+            [framework-lib.side-bar-menu :as sbm]
+            [validator-lib.core :refer [validate-input]]
+            [common-client.user.html :as uh]
+            [common-client.role.html :as rh]
+            [common-client.language.html :as lh]
             [language-lib.core :refer [get-label]]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
             [common-middle.functionalities :as fns]))
 
-(defn form
+(defn form-fn
   "Generate table HTML element that contains login form"
   [login-evt
    sign-up-evt]
   (gen
-    (table
-      [(tr
-         [(td
+    (form
+      (div
+        [(fieldset
+           [(label
+              [(get-label 14)
+               (input
+                 ""
+                 {:id "txtEmailId"
+                  :type "text"
+                  :placeholder (get-label 14)
+                  :title (get-label 14)
+                  :required true}
+                 {:oninput {:evt-fn validate-input}})
+               (span)])
             (label
-              (get-label 14)
-              {:for "txtEmailId"}))
-          (td
-            (input
-              ""
-              {:id "txtEmailId"
-               :name "txtEmailN"
-               :type "text"
-               :required "required"}))]
-        )
-       (tr
-         [(td
+              [(get-label 15)
+               (input
+                 ""
+                 {:id "pswLoginId"
+                  :type "password"
+                  :placeholder (get-label 15)
+                  :title (get-label 15)
+                  :required true}
+                 {:oninput {:evt-fn validate-input}})
+               (span)])
             (label
-              (get-label 15)
-              {:for "pswLoginId"}))
-          (td
+              [(get-label 16)
+               (input
+                 ""
+                 {:id "chkRememberMeId"
+                  :type "checkbox"
+                  :title (get-label 16)})
+               (span)])]
+          )
+         (div
+           [(input
+              ""
+              {:type "submit"
+               :value (get-label 17)
+               :class "btn btn-default"}
+              login-evt)
             (input
               ""
-              {:id "pswLoginId"
-               :name "pswLoginN"
-               :type "password"
-               :required "required"}))]
-        )
-       (tr
-         [(td
-            (label
-              (get-label 16)
-              {:for "chkRememberMeId"}))
-          (td
-            (input
-              ""
-              {:id "chkRememberMeId"
-               :type "checkbox"}))]
-        )
-       (tr
-         [(td)
-          (td
-            (input
-              ""
-              {:id "btnLoginId"
-               :name "btnLoginN"
-               :type "button"
-               :value (get-label 17)}
-              login-evt))]
-        )
-       (tr
-         [(td)
-          (td
-            (a
-              (get-label 18)
-              {:id "aSignUpId"
-               :style
-                 {:float "right"}}
-              sign-up-evt))
-          ])]
-      {:class "login"}))
+              {:type "button"
+               :value (get-label 18)
+               :class "btn"}
+              sign-up-evt)])]
+       )
+     {:class "login"
+      :onsubmit "return false"
+      :novalidate true
+      :autocomplete "off"}))
  )
 
 (defn home-fn
   "Generate and render home page"
-  []
+  [evt-p
+   element
+   event]
   (md/remove-element-content
     ".content")
-  (md/remove-element-content
-    ".sidebar-menu")
+  (sbm/collapse-all-items)
   (md/append-element
     ".content"
     (gen
-      [(div
-         "Home")
-       #_(input
-         ""
-         {:type "button"
-          :value "Test"}
-         {:onclick {:evt-fn run-test}})
-       (input
-         ""
-         {:type "button"
-          :value "Popup"}
-         {:onclick {:evt-fn popup-fn
-                    :evt-p {:content "Try again later"
-                            :heading "Information"}}
-          })])
-   ))
+      (if evt-p
+        evt-p
+        [(h2
+           "Home page")
+         (p
+           "Web app description")
+         (input
+           ""
+           {:value "Popup"
+            :type "button"}
+           {:onclick {:evt-fn popup-fn
+                      :evt-p {:content "Test content"
+                              :heading "Test heading"}}
+            })])
+     ))
+ )
 
-(defn nav-fn
+(defn account-fn
   "Header navigation menu"
   [logout-fn
-   username
-   custom-menu]
-  (let [final-menu [(div
-                      username
-                      {:class "dropDownMenu"})
-                    (a
-                      (get-label 3)
-                      {:id "aHomeId"}
-                      {:onclick {:evt-fn home-fn}})
-                    (when (contains?
-                            @allowed-actions
-                            fns/user-read)
-                      (a
-                        (get-label 21)
-                        {:id "aUserId"}
-                        {:onclick {:evt-fn uc/nav-link}}))
-                    (when (contains?
-                            @allowed-actions
-                            fns/role-read)
-                      (a
-                        (get-label 22)
-                        {:id "aRoleId"}
-                        {:onclick {:evt-fn rc/nav-link}}))
-                    (when (contains?
-                            @allowed-actions
-                            fns/language-read)
-                      (a
-                        (get-label 23)
-                        {:id "aLanguageId"}
-                        {:onclick {:evt-fn lc/nav-link}}))]
-        final-menu (if custom-menu
-                     (apply
-                       conj
-                       final-menu
-                       (custom-menu))
-                     final-menu)
-        final-menu (conj
-                     final-menu
-                     (a
-                       (get-label 2)
-                       {:id "aLogoutId"}
-                       {:onclick {:evt-fn logout-fn}}))]
-    (nav
-      final-menu))
- )
+   username]
+  [(div
+     [(div
+        ""
+        {:class "default-user-img"})
+      (div
+        username)])
+   (div
+     [(div
+        [(div
+           ""
+           {:class "logout-img"})
+         (div
+           (get-label 2))]
+        nil
+        {:onclick {:evt-fn logout-fn}})]
+     {:class "account-items"})])
 
 (defn language-fn
   "Language select language"
   [change-language-fn
-   language-name]
-  (div
-    [(div
-       language-name
-       {:class "languageDropDownMenu"})
-     (a
-       "English"
-       {:id "aEnglishId"}
-       {:onclick {:evt-fn change-language-fn
-                  :evt-p {:language :english
-                          :language-name "English"}}})
-     (a
-       "Srpski"
-       {:id "aSerbianId"}
-       {:onclick {:evt-fn change-language-fn
-                  :evt-p {:language :serbian
-                          :language-name "Srpski"}}
-        })])
- )
+   language-name
+   language-icon]
+  [(div
+     [(div
+        ""
+        {:class language-icon})
+      (div
+        language-name)])
+   (div
+     [(div
+        [(div
+           ""
+           {:class "us-flag-img"})
+         (div
+           (get-label 25))]
+        nil
+        {:onclick {:evt-fn change-language-fn
+                   :evt-p {:language "english"
+                           :language-name (get-label 25)}}
+         })
+      (div
+        [(div
+           ""
+           {:class "rs-flag-img"})
+         (div
+           (get-label 26))]
+        nil
+        {:onclick {:evt-fn change-language-fn
+                   :evt-p {:language "serbian"
+                           :language-name (get-label 26)}}
+         })]
+     {:class "lang-items"})])
+
+(defn side-bar-menu
+  "Generate side bar menu vector"
+  [custom-menu]
+  (apply
+    conj
+    custom-menu
+    [(when (or (contains?
+                 @allowed-actions
+                 fns/user-create)
+               (contains?
+                 @allowed-actions
+                 fns/user-read)
+               (contains?
+                 @allowed-actions
+                 fns/role-create)
+               (contains?
+                 @allowed-actions
+                 fns/role-read)
+               (contains?
+                 @allowed-actions
+                 fns/language-create)
+               (contains?
+                 @allowed-actions
+                 fns/language-read))
+       {:label (get-label 32)
+        :id "administration-nav-id"
+        :sub-menu [(uh/nav)
+                   (rh/nav)
+                   (lh/nav)]})]
+   ))
 
 (defn template
   "Template of main page"
@@ -182,29 +194,42 @@
    username
    change-language-fn
    language-name
-   custom-menu]
-  (gen
-    [(div
-       [(div
-          (nav-fn
-            logout-fn
-            username
-            custom-menu)
-          {:class "dropDownMenuContainer"})
-        (div
-          (language-fn
-            change-language-fn
-            language-name)
-          {:class "languageDropDownMenuContainer"})]
-       {:class "header"})
-     (div
-       ""
-       {:class "sidebar-menu"})
-     (div
-       ""
-       {:class "content"})
-     (div
-       ""
-       {:class "footer"})])
- )
+   language-icon
+   custom-menu
+   home-page-content]
+  (let [custom-menu (if (fn? custom-menu)
+                      (custom-menu)
+                      [])
+        side-bar-menu-content (sbm/final-menu
+                                (side-bar-menu
+                                  custom-menu))]
+    (gen
+      [(header
+         [(div
+            (div
+              ""
+              {:class "logo-img"})
+            {:class "logo"}
+            {:onclick {:evt-fn home-fn
+                       :evt-p home-page-content}})
+          (div
+            (account-fn
+              logout-fn
+              username)
+            {:class "account-menu"})
+          (div
+            (language-fn
+              change-language-fn
+              language-name
+              language-icon)
+            {:class "language-menu"})])
+       (aside
+         (nav
+           side-bar-menu-content))
+       (section
+         home-page-content
+         {:class "content"})
+       (footer
+         "")])
+   ))
 

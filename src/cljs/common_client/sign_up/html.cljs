@@ -1,84 +1,90 @@
 (ns common-client.sign-up.html
-  (:require [htmlcss-lib.core :refer [gen table tr td h3 label input]]
-            [language-lib.core :refer [get-label]]))
+  (:require [htmlcss-lib.core :refer [gen label input form div
+                                      fieldset span]]
+            [validator-lib.core :refer [validate-input]]
+            [language-lib.core :refer [get-label]]
+            [common-client.user.entity :refer [password-pattern]]))
 
-(defn form
+(defn form-fn
   "Generate table HTML element that contains sign up form"
   [sign-up-evt
    cancel-evt]
   (gen
-    (table
-      [(tr
-         (td
-           (h3 (get-label 18))
-           {:colspan 2})
-        )
-       (tr
-         [(td
+    (form
+      (div
+        [(fieldset
+           [(label
+              [(get-label 19)
+               (input
+                 ""
+                 {:id "txtUsernameId"
+                  :type "text"
+                  :placeholder (get-label 19)
+                  :title (get-label 19)
+                  :required true}
+                 {:oninput {:evt-fn validate-input}})
+               (span)])
             (label
-              (get-label 19)
-              {:for "txtUsernameId"}))
-          (td
-            (input
-              ""
-              {:id "txtUsernameId"
-               :type "text"
-               :required "required"}))]
-        )
-       (tr
-        [(td
-           (label
-             (get-label 14)
-             {:for "txtEmailId"}))
-         (td
-           (input
-             ""
-             {:id "txtEmailId"
-              :type "email"
-              :required "required"}))]
-        )
-       (tr
-         [(td
+              [(get-label 14)
+               (input
+                 ""
+                 {:id "txtEmailId"
+                  :type "email"
+                  :placeholder (get-label 14)
+                  :title (get-label 14)
+                  :required true}
+                 {:oninput {:evt-fn validate-input}})
+               (span)])
             (label
-              (get-label 15)
-              {:for "pswSignUpId"}))
-          (td
-            (input
-              ""
-              {:id "pswSignUpId"
-               :type "password"
-               :required "required"}))]
-        )
-       (tr
-         [(td
+              [(get-label 15)
+               (input
+                 ""
+                 {:id "pswSignUpId"
+                  :type "password"
+                  :placeholder (get-label 15)
+                  :minlength 8
+                  :maxlength 40
+                  :title (get-label 15)
+                  :pattern password-pattern
+                  :required true}
+                 {:oninput {:evt-fn validate-input
+                            :evt-p {:pattern-mismatch (get-label 64)}}
+                  })
+               (span)])
             (label
-              (get-label 20)
-              {:for "pswConfirmSignUpId"}))
-          (td
+              [(get-label 20)
+               (input
+                 ""
+                 {:id "pswConfirmSignUpId"
+                  :type "password"
+                  :placeholder (get-label 20)
+                  :minlength 8
+                  :maxlength 40
+                  :title (get-label 20)
+                  :pattern password-pattern
+                  :required true}
+                 {:oninput {:evt-fn validate-input
+                            :evt-p {:pattern-mismatch (get-label 64)}}
+                  })
+               (span)])]
+          )
+         (div
+           [(input
+              ""
+              {:type "submit"
+               :value (get-label 18)
+               :class "btn btn-default"}
+              sign-up-evt)
             (input
               ""
-              {:id "pswConfirmSignUpId"
-               :type "password"
-               :required "required"}))]
-        )
-       (tr
-         [(td
-            (input
-              ""
-              {:id "btnCancelId"
-               :type "button"
+              {:type "button"
                :value (get-label 12)
-               :style {:float "right"}}
-              cancel-evt))
-          (td
-            (input
-              ""
-              {:id "btnSignUpId"
-               :name "btnSignUpN"
-               :type "button"
-               :value (get-label 18)}
-              sign-up-evt))]
-        )]
-      {:class "signUp"}))
+               :class "btn"}
+              cancel-evt)])]
+       )
+     {:class "login"
+      :onsubmit "return false"
+      :novalidate true
+      :autocomplete "off"}))
  )
 

@@ -2,6 +2,8 @@
   (:require [ajax-lib.core :refer [ajax get-response]]
             [utils-lib.core :as utils]
             [framework-lib.core :as frm]
+            [validator-lib.core :refer [validate-field]]
+            [language-lib.core :refer [get-label]]
             [js-lib.core :as md]
             [common-client.sign-up.html :as suh]
             [common-middle.request-urls :as rurls]
@@ -11,11 +13,23 @@
   "Sign up error function"
   [xhr]
   (let [response (get-response xhr)
+        status (:status response)
         message (:message response)
-        status (:status response)]
-    (frm/popup-fn
-      {:heading status
-       :content message}))
+        username (md/get-by-id
+                   "txtUsernameId")
+        email (md/get-by-id
+                "txtEmailId")
+        is-valid (atom true)]
+    (validate-field
+      username
+      is-valid
+      (get-label 61)
+      true)
+    (validate-field
+      email
+      is-valid
+      (get-label 61)
+      true))
  )
 
 (defn sign-up-evt
@@ -24,51 +38,80 @@
   {:onclick
     {:evt-fn
       (fn []
-        (let [username (md/get-value
+        (let [username (md/query-selector-on-element
+                         ".login"
                          "#txtUsernameId")
-              v-username (md/is-valid?
-                           "#txtUsernameId")
-              email (md/get-value
+              email (md/query-selector-on-element
+                      ".login"
                       "#txtEmailId")
-              v-email (md/is-valid?
-                        "#txtEmailId")
-              password (md/get-value
+              password (md/query-selector-on-element
+                         ".login"
                          "#pswSignUpId")
-              v-password (md/is-valid?
-                           "#pswSignUpId")
-              confirm-password (md/get-value
+              confirm-password (md/query-selector-on-element
+                                 ".login"
                                  "#pswConfirmSignUpId")
-              v-confirm-password (md/is-valid?
-                                   "#pswConfirmSignUpId")]
-          (if (and v-username
-                   v-email
-                   v-password
-                   v-confirm-password
-                   (= password
+              is-valid (atom true)]
+          (validate-field
+            username
+            is-valid)
+          (validate-field
+            email
+            is-valid)
+          (validate-field
+            password
+            is-valid)
+          (let [validity (.-validity
+                           password)]
+            (when (.-patternMismatch
+                    validity)
+              (validate-field
+                password
+                is-valid
+                (get-label 64)
+                true)
+             ))
+          (validate-field
+            confirm-password
+            is-valid)
+          (when @is-valid
+            (validate-field
+              confirm-password
+              is-valid
+              (get-label 60)
+              (not= (md/get-value
+                      password)
+                    (md/get-value
                       confirm-password))
-            (ajax
-              {:url rurls/sign-up-url
-               :success-fn cancel-fn
-               :error-fn sign-up-error
-               :entity {:entity-type user-cname
-                        :entity {:username username
-                                 :password (utils/encrypt-password
-                                             password)
-                                 :email email}
-                        :_id ""}})
-            (.log js/console "Validation failed"))
-         ))
-     }})
+             ))
+          (when @is-valid
+            (let [username (md/get-value
+                             username)
+                  email (md/get-value
+                          email)
+                  password (md/get-value
+                             password)]
+              (ajax
+                {:url rurls/sign-up-url
+                 :success-fn cancel-fn
+                 :error-fn sign-up-error
+                 :entity {:entity-type user-cname
+                          :entity {:username username
+                                   :password (utils/encrypt-password
+                                               password)
+                                   :email email}
+                          :_id ""}}))
+           ))
+       )}})
 
 (defn sign-up-evt-fn
   "Sign up form with cancel events"
   [{cancel-fn :cancel-fn
     cancel-evt :cancel-evt}]
   (md/remove-element-content
-    ".body")
+    "body > div:first-child")
   (md/append-element
-    ".body"
-    (suh/form
+    "body > div:first-child"
+    (suh/form-fn
       (sign-up-evt
         cancel-fn)
       cancel-evt))

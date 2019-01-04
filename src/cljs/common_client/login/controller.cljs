@@ -3,13 +3,17 @@
             [js-lib.core :as md]
             [utils-lib.core :as utils]
             [framework-lib.core :as frm]
+            [validator-lib.core :refer [validate-field]]
             [common-client.login.html :as lhtml]
             [common-client.sign-up.controller :as suc]
             [common-client.allowed-actions.controller :as aa]
             [common-middle.request-urls :as rurls]
-            [language-lib.core :refer [cached-labels]]))
+            [language-lib.core :refer [cached-labels get-label]]))
 
 (def custom-menu
+     (atom nil))
+
+(def home-page-content
      (atom nil))
 
 (def logout-fn
@@ -22,7 +26,7 @@
   "Remove main page from HTML document"
   []
   (md/remove-element-content
-    ".body"))
+    "body > div:first-child"))
 
 (defn set-cookie
   "Set cookie in browser"
@@ -35,9 +39,8 @@
 (defn is-session-expired
   "Check if session cookie exists"
   []
-  (let [cookies (aget
-                  js/document
-                  "cookie")]
+  (let [cookies (.-cookie
+                  js/document)]
     (= -1
        (.indexOf
          cookies
@@ -88,15 +91,37 @@
   (aa/get-allowed-actions)
   (let [response (get-response xhr)
         username (:username response)
-        language-name (:language-name response)]
+        language-changed-to (:language response)
+        language-name (atom "")
+        language-icon (atom "")]
+    (when (= language-changed-to
+             "english")
+      (reset!
+        language-name
+        (get-label 25))
+      (swap!
+        language-icon
+        str
+        "us-flag-img"))
+    (when (= language-changed-to
+             "serbian")
+      (reset!
+        language-name
+        (get-label 26))
+      (swap!
+        language-icon
+        str
+        "rs-flag-img"))
     (md/append-element
-      ".body"
+      "body > div:first-child"
       (lhtml/template
         @logout-fn
         username
         change-language-fn
-        language-name
-        @custom-menu))
+        @language-name
+        @language-icon
+        @custom-menu
+        @home-page-content))
    ))
 
 (defn login-success
@@ -107,7 +132,7 @@
     cached-labels
     [])
   (md/remove-element-content
-    ".body")
+    "body > div:first-child")
   (logout-on-session-expired)
   (main-page
     xhr))
@@ -120,54 +145,69 @@
         email (md/get-by-id
                 "txtEmailId")
         password (md/get-by-id
-                   "pswLoginId")]
-    (md/remove-class
+                   "pswLoginId")
+        is-valid (atom true)]
+    (validate-field
       email
-      "error")
-    (md/remove-class
+      is-valid
+      (get-label 58)
+      (= (:email response)
+         "error"))
+    (validate-field
       password
-      "error")
-    (md/remove-class
-      email
-      "success")
-    (md/remove-class
-      password
-      "success")
-    (md/add-class
-      email
-      (:email response))
-    (md/add-class
-      password
-      (:password response))
+      is-valid
+      (get-label 59)
+      (= (:password response)
+         "error"))
    ))
 
-(defn read-login-form
-  "Read data from login form"
-  []
-  (let [email (md/get-value
+(defn submit-form
+  "Submit login form"
+  [evt-p
+   element
+   event]
+  (let [email (md/query-selector-on-element
+                ".login"
                 "#txtEmailId")
-        password (md/get-value
+        password (md/query-selector-on-element
+                   ".login"
                    "#pswLoginId")
-        remember-me (md/get-checked
-                      "#chkRememberMeId")]
-    {:email email
-     :password (utils/encrypt-password
-                 password)
-     :remember-me remember-me}))
+        remember-me (md/query-selector-on-element
+                      ".login"
+                      "#chkRememberMeId")
+        is-valid (atom true)]
+    (validate-field
+      email
+      is-valid)
+    (validate-field
+      password
+      is-valid)
+    (when @is-valid
+      (let [email (md/get-value
+                    "#txtEmailId")
+            password (md/get-value
+                       "#pswLoginId")
+            remember-me (md/get-checked
+                          "#chkRememberMeId")]
+        (ajax
+          {:url rurls/login-url
+           :success-fn login-success
+           :error-fn login-error
+           :entity {:email email
+                    :password (utils/encrypt-password
+                                password)
+                    :remember-me remember-me}}))
+     ))
+ )
 
 (defn redirect-to-login
   "Redirect to login page"
   []
   (md/append-element
-    ".body"
-    (lhtml/form
+    "body > div:first-child"
+    (lhtml/form-fn
       {:onclick
-        {:evt-fn ajax
-         :evt-p {:url rurls/login-url
-                 :success-fn login-success
-                 :error-fn login-error
-                 :entity read-login-form}}
-       }
+        {:evt-fn submit-form}}
       {:onclick
          {:evt-fn suc/sign-up-evt-fn
           :evt-p

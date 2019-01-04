@@ -18,11 +18,14 @@
    :entity-name (get-label 22)
    :fields {:role-name {:label (get-label 28)
                         :input-el "text"
-                        :attrs {:required "required"}}
+                        :attrs {:placeholder (get-label 28)
+                                :required true}}
             :functionalities {:label (get-label 29)
-                              :input-el "checkbox"
-                              :attrs {:required "required"}
-                              :options @functionalities}}
+                              :input-el "select"
+                              :options @functionalities
+                              :attrs {:required true
+                                      :multiple true}}
+            }
    :fields-order [:role-name
                   :functionalities]})
 
@@ -35,8 +38,8 @@
    :style
     {:role-name
       {:content (get-label 28)
-       :th {:style {:width "200px"}}
-       :td {:style {:width "200px"
+       :th {:style {:width "70%"}}
+       :td {:style {:width "70%"
                     :text-align "left"}}
        }
      :functionalities
@@ -57,7 +60,7 @@
    :qsort {:role-name 1}
    :pagination true
    :current-page 0
-   :rows 25
+   :rows 10
    :collation {:locale "sr"}})
 
 (defn table-conf-fn

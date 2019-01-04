@@ -1,6 +1,10 @@
 (ns common-client.user.entity
   (:require [ajax-lib.core :refer [sjax get-response]]
+            [utils-lib.core :as utils]
+            [js-lib.core :as md]
+            [htmlcss-lib.core :refer [div label input span]]
             [framework-lib.core :refer [gen-table]]
+            [validator-lib.core :refer [validate-input]]
             [language-lib.core :refer [get-label]]
             [common-middle.request-urls :as rurls]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
@@ -35,6 +39,65 @@
          op-value]))
     @options))
 
+(def password-pattern
+     "(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&\\.])[A-Za-z\\d@$!%*?&\\.]{8,40}")
+
+(defn sub-form
+  "Generate ingredients sub form"
+  [data
+   attrs]
+  (let [disabled (:disabled attrs)
+        new-attrs {:id "pswFormId"
+                   :type "password"
+                   :placeholder (get-label 15)
+                   :minlength 8
+                   :maxlength 40
+                   :title (get-label 15)
+                   :pattern password-pattern
+                   :required true}
+        new-attrs (if disabled
+                    (assoc
+                      new-attrs
+                      :disabled
+                      true)
+                    new-attrs)]
+    [(div
+       (label
+         [(get-label 15)
+          (input
+            ""
+            new-attrs
+            {:oninput {:evt-fn validate-input
+                       :evt-p {:pattern-mismatch (get-label 64)}}
+             })
+          (span)])
+      )])
+ )
+
+(defn read-form
+  "Read meal form"
+  []
+  (let [password-change-el (md/query-selector-on-element
+                             ".entity"
+                             "#pswFormId")
+        password-change-value (md/get-value
+                                password-change-el)]
+    (utils/encrypt-password
+      password-change-value))
+ )
+
+(defn validate-form
+  "Validate password special field"
+  [validate-field-fn
+   is-valid]
+  (let [input-element (md/query-selector-on-element
+                        ".entity"
+                        "#pswFormId")]
+    (validate-field-fn
+      input-element
+      is-valid))
+ )
+
 (defn form-conf-fn
   "Form configuration for user entity"
   []
@@ -42,18 +105,32 @@
    :type entity-type
    :entity-name (get-label 21)
    :fields {:username {:label (get-label 19)
-                       :input-el "text"}
+                       :input-el "text"
+                       :attrs {:required true
+                               :placeholder (get-label 19)}}
             :password {:label (get-label 15)
-                       :input-el "password"}
+                       :input-el "sub-form"
+                       :sub-form-fieldset sub-form
+                       :sub-form-fieldset-read read-form
+                       :sub-form-validation validate-form}
             :email {:label (get-label 14)
-                    :input-el "email"}
+                    :input-el "email"
+                    :attrs {:required true
+                            :placeholder (get-label 14)}}
             :roles {:label (get-label 30)
-                    :input-el "checkbox"
-                    :options get-roles}}
+                    :input-el "select"
+                    :options get-roles
+                    :attrs {:required true
+                            :multiple true}}}
    :fields-order [:username
-                  :password
                   :email
-                  :roles]})
+                  :password
+                  :roles]
+   :projection [:username
+                :email
+                ;:password
+                :roles]
+   :projection-include true})
 
 (defn columns-fn
   "Table columns for user entity"
@@ -65,8 +142,8 @@
    :style
     {:username
       {:content (get-label 19)
-       :th {:style {:width "100px"}}
-       :td {:style {:width "100px"
+       :th {:style {:width "35%"}}
+       :td {:style {:width "35%"
                     :text-align "left"}}
        }
      :password
@@ -77,8 +154,8 @@
        }
      :email
       {:content (get-label 14)
-       :th {:style {:width "100px"}}
-       :td {:style {:width "100px"
+       :th {:style {:width "35%"}}
+       :td {:style {:width "35%"
                     :text-align "left"}}
        }}
     })
@@ -93,7 +170,7 @@
    :qsort {:username 1}
    :pagination true
    :current-page 0
-   :rows 25
+   :rows 10
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
