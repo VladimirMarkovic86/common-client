@@ -74,12 +74,14 @@
 
 (defn home-fn
   "Generate and render home page"
-  [evt-p
-   element
-   event]
+  [{evt-p :evt-p
+    collapse :collapse}
+   & [element
+      event]]
   (md/remove-element-content
     ".content")
-  (sbm/collapse-all-items)
+  (when collapse
+    (sbm/collapse-all-items))
   (md/append-element
     ".content"
     (gen
@@ -202,7 +204,9 @@
                       [])
         side-bar-menu-content (sbm/final-menu
                                 (side-bar-menu
-                                  custom-menu))]
+                                  custom-menu)
+                                home-fn
+                                home-page-content)]
     (gen
       [(header
          [(div
@@ -211,7 +215,9 @@
               {:class "logo-img"})
             {:class "logo"}
             {:onclick {:evt-fn home-fn
-                       :evt-p home-page-content}})
+                       :evt-p {:evt-p home-page-content
+                               :collapse true}}
+             })
           (div
             (account-fn
               logout-fn
