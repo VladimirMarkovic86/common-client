@@ -9,6 +9,7 @@
             [common-client.user.html :as uh]
             [common-client.role.html :as rh]
             [common-client.language.html :as lh]
+            [common-client.chat.html :as ch]
             [language-lib.core :refer [get-label]]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
             [common-middle.functionalities :as fns]))
@@ -161,11 +162,14 @@
 
 (defn side-bar-menu
   "Generate side bar menu vector"
-  [custom-menu]
+  [custom-menu
+   logged-in-username]
   (apply
     conj
     custom-menu
-    [(when (or (contains?
+    [(ch/nav
+       logged-in-username)
+     (when (or (contains?
                  @allowed-actions
                  fns/user-create)
                (contains?
@@ -198,13 +202,15 @@
    language-name
    language-icon
    custom-menu
-   home-page-content]
+   home-page-content
+   logged-in-username]
   (let [custom-menu (if (fn? custom-menu)
                       (custom-menu)
                       [])
         side-bar-menu-content (sbm/final-menu
                                 (side-bar-menu
-                                  custom-menu)
+                                  custom-menu
+                                  logged-in-username)
                                 home-fn
                                 home-page-content)]
     (gen

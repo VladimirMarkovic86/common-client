@@ -8,7 +8,8 @@
             [language-lib.core :refer [get-label]]
             [common-middle.request-urls :as rurls]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
-            [common-middle.collection-names :refer [user-cname]]))
+            [common-middle.collection-names :refer [user-cname
+                                                    role-cname]]))
 
 (def entity-type
      user-cname)
@@ -18,7 +19,7 @@
   []
   (let [xhr (sjax
               {:url rurls/get-entities-url
-               :entity {:entity-type "role"
+               :entity {:entity-type role-cname
                         :entity-filter {}
                         :projection [:_id :role-name]
                         :projection-include true
