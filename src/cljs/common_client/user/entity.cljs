@@ -83,7 +83,7 @@
                              "#pswFormId")
         password-change-value (md/get-value
                                 password-change-el)]
-    (utils/encrypt-password
+    (utils/sha256
       password-change-value))
  )
 

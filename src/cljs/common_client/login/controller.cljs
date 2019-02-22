@@ -201,7 +201,7 @@
            :success-fn login-success
            :error-fn login-error
            :entity {:email email
-                    :password (utils/encrypt-password
+                    :password (utils/sha256
                                 password)
                     :remember-me remember-me}}))
      ))

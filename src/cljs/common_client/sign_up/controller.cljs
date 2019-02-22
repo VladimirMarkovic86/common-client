@@ -96,7 +96,7 @@
                  :error-fn sign-up-error
                  :entity {:entity-type user-cname
                           :entity {:username username
-                                   :password (utils/encrypt-password
+                                   :password (utils/sha256
                                                password)
                                    :email email}
                           :_id ""}}))
