@@ -8,6 +8,7 @@
             [common-client.sign-up.controller :as suc]
             [common-client.allowed-actions.controller :as aa]
             [common-middle.request-urls :as rurls]
+            [common-middle.session :as cms]
             [language-lib.core :refer [cached-labels get-label]]))
 
 (def custom-menu
@@ -103,6 +104,9 @@
     (when (= language-changed-to
              "english")
       (reset!
+        cms/selected-language
+        language-changed-to)
+      (reset!
         language-name
         (get-label 25))
       (swap!
@@ -111,6 +115,9 @@
         "us-flag-img"))
     (when (= language-changed-to
              "serbian")
+      (reset!
+        cms/selected-language
+        language-changed-to)
       (reset!
         language-name
         (get-label 26))

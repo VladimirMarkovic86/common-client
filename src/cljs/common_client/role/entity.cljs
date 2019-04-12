@@ -2,7 +2,8 @@
   (:require [framework-lib.core :refer [gen-table]]
             [language-lib.core :refer [get-label]]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
-            [common-middle.collection-names :refer [role-cname]]))
+            [common-middle.collection-names :refer [role-cname]]
+            [common-middle.role.entity :as cmre]))
 
 (def entity-type
      role-cname)
@@ -60,7 +61,7 @@
    :qsort {:role-name 1}
    :pagination true
    :current-page 0
-   :rows 10
+   :rows cmre/rows
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
@@ -71,6 +72,7 @@
    :form-conf (form-conf-fn)
    :actions [:details :edit :delete]
    :allowed-actions @allowed-actions
+   :reports-on true
    :search-on true
    :search-fields [:role-name]
    :render-in ".content"

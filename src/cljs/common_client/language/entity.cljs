@@ -2,7 +2,8 @@
   (:require [framework-lib.core :refer [gen-table]]
             [language-lib.core :refer [get-label]]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
-            [common-middle.collection-names :refer [language-cname]]))
+            [common-middle.collection-names :refer [language-cname]]
+            [common-middle.language.entity :as cmle]))
 
 (def entity-type
      language-cname)
@@ -41,7 +42,7 @@
       {:content (get-label 24)
        :th {:style {:width "10%"}}
        :td {:style {:width "10%"
-                    :text-align "left"}}
+                    :text-align "center"}}
        }
      :english
       {:content (get-label 25)
@@ -67,7 +68,7 @@
    :qsort {:code 1}
    :pagination true
    :current-page 0
-   :rows 10
+   :rows cmle/rows
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
@@ -78,6 +79,7 @@
    :form-conf (form-conf-fn)
    :actions [:details :edit :delete]
    :allowed-actions @allowed-actions
+   :reports-on true
    :search-on true
    :search-fields [:english :serbian]
    :render-in ".content"

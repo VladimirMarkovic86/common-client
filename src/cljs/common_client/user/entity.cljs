@@ -6,6 +6,7 @@
             [framework-lib.core :refer [gen-table]]
             [validator-lib.core :refer [validate-input]]
             [language-lib.core :refer [get-label]]
+            [common-middle.user.entity :as cmue]
             [common-middle.request-urls :as rurls]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
             [common-middle.collection-names :refer [user-cname
@@ -171,7 +172,7 @@
    :qsort {:username 1}
    :pagination true
    :current-page 0
-   :rows 10
+   :rows cmue/rows
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
@@ -182,6 +183,7 @@
    :form-conf (form-conf-fn)
    :actions [:details :edit :delete]
    :allowed-actions @allowed-actions
+   :reports-on true
    :search-on true
    :search-fields [:username :email]
    :render-in ".content"
