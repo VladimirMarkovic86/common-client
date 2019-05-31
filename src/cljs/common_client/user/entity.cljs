@@ -77,7 +77,7 @@
  )
 
 (defn read-form
-  "Read meal form"
+  "Read user form"
   []
   (let [password-change-el (md/query-selector-on-element
                              ".entity"

@@ -6,6 +6,7 @@
             [validator-lib.core :refer [validate-field]]
             [common-client.login.html :as lhtml]
             [common-client.sign-up.controller :as suc]
+            [common-client.forgot-password.controller :as fpc]
             [common-client.allowed-actions.controller :as aa]
             [common-middle.request-urls :as rurls]
             [common-middle.session :as cms]
@@ -224,6 +225,15 @@
         {:evt-fn submit-form}}
       {:onclick
          {:evt-fn suc/sign-up-evt-fn
+          :evt-p
+            {:cancel-fn @logout-success-fn
+             :cancel-evt
+               {:onclick
+                 {:evt-fn @logout-success-fn}}
+             }}
+       }
+      {:onclick
+         {:evt-fn fpc/forgot-password-evt-fn
           :evt-p
             {:cancel-fn @logout-success-fn
              :cancel-evt

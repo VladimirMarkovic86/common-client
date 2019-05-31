@@ -1,7 +1,7 @@
 (ns common-client.login.html
   (:require [htmlcss-lib.core :refer [gen label input div nav header
                                       footer section aside fieldset
-                                      form h2 p span]]
+                                      form h2 p span a svg polyline]]
             [js-lib.core :as md]
             [framework-lib.core :refer [popup-fn]]
             [framework-lib.side-bar-menu :as sbm]
@@ -17,7 +17,8 @@
 (defn form-fn
   "Generate table HTML element that contains login form"
   [login-evt
-   sign-up-evt]
+   sign-up-evt
+   forgot-password-evt]
   (gen
     (form
       (div
@@ -51,8 +52,15 @@
                  {:id "chkRememberMeId"
                   :type "checkbox"
                   :title (get-label 16)})
-               (span)])]
-          )
+               (span)])
+            (div
+              (label
+                (a
+                  (get-label 76)
+                  {:id "forgotPasswordId"
+                   :title (get-label 76)}
+                  forgot-password-evt))
+              {:style {:margin-bottom "27px"}})])
          (div
            [(input
               ""
@@ -194,6 +202,46 @@
                    (lh/nav)]})]
    ))
 
+(defn render-svg-logo
+  "Renders logo with svg element"
+  [width
+   height]
+  (let [points-a (atom "")
+        width-segments (range
+                         0
+                         (inc
+                           width)
+                         (int
+                           (/ width
+                              4))
+                        )
+        itr (atom 0)]
+    (doseq [x width-segments]
+      (swap!
+        points-a
+        str
+        x
+        ","
+        (if (odd?
+              @itr)
+          0
+          height)
+        " ")
+      (swap!
+        itr
+        inc))
+    (svg
+      (polyline
+        ""
+        {:class "logo-svg-polyline"
+         :points @points-a})
+      {:class "logo-svg"
+       :width (str
+                width "px")
+       :height (str
+                 height "px")})
+   ))
+
 (defn template
   "Template of main page"
   [logout-fn
@@ -216,9 +264,9 @@
     (gen
       [(header
          [(div
-            (div
-              ""
-              {:class "logo-img"})
+            (render-svg-logo
+              60
+              28)
             {:class "logo"}
             {:onclick {:evt-fn home-fn
                        :evt-p {:evt-p home-page-content

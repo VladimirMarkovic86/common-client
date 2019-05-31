@@ -1,7 +1,6 @@
 (ns common-client.sign-up.controller
   (:require [ajax-lib.core :refer [ajax get-response]]
             [utils-lib.core :as utils]
-            [framework-lib.core :as frm]
             [validator-lib.core :refer [validate-field]]
             [language-lib.core :refer [get-label]]
             [js-lib.core :as md]
@@ -68,8 +67,8 @@
                 password
                 is-valid
                 (get-label 64)
-                true)
-             ))
+                true))
+           )
           (validate-field
             confirm-password
             is-valid)
