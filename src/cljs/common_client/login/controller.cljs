@@ -33,14 +33,6 @@
   (md/remove-element-content
     "body > div:first-child"))
 
-(defn set-cookie
-  "Set cookie in browser"
-  [cookie-value]
-  (aset
-    js/document
-    "cookie"
-    cookie-value))
-
 (defn is-session-expired
   "Check if session cookie exists"
   []
@@ -55,8 +47,11 @@
 (defn is-login-displayed
   "Check if login form displayed"
   []
-  (md/query-selector
-    "table.login"))
+  (not
+    (nil?
+      (md/query-selector
+        "form.login"))
+   ))
 
 (defn logout-on-session-expired
   "Log out if session expired"
