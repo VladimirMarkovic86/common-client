@@ -10,6 +10,7 @@
             [common-client.role.html :as rh]
             [common-client.language.html :as lh]
             [common-client.chat.html :as ch]
+            [common-client.preferences.html :as ccph]
             [language-lib.core :refer [get-label]]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
             [common-middle.functionalities :as fns]))
@@ -123,6 +124,14 @@
         username)])
    (div
      [(div
+        [(div
+           ""
+           {:class "preferences-img"})
+         (div
+           (get-label 83))]
+        nil
+        {:onclick {:evt-fn ccph/display-preferences-popup}})
+      (div
         [(div
            ""
            {:class "logout-img"})

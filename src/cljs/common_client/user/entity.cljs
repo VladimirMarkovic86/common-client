@@ -172,13 +172,15 @@
    :qsort {:username 1}
    :pagination true
    :current-page 0
-   :rows cmue/rows
+   :rows (cmue/calculate-rows)
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
   "Table configuration for user entity"
   []
-  {:query (query-fn)
+  {:preferences cmue/preferences
+   :query-fn query-fn
+   :query (query-fn)
    :columns (columns-fn)
    :form-conf (form-conf-fn)
    :actions [:details :edit :delete]

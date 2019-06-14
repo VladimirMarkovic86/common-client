@@ -22,13 +22,13 @@
                   {:label (get-label 4)
                    :id "role-create-nav-id"
                    :evt-fn create-entity
-                   :evt-p (table-conf-fn)})
+                   :evt-p table-conf-fn})
                 (when (contains?
                         @allowed-actions
                         fns/role-read)
                   {:label (get-label 5)
                    :id "role-show-all-nav-id"
                    :evt-fn gen-table
-                   :evt-p (table-conf-fn)})]}
-   ))
+                   :evt-p table-conf-fn})]})
+ )
 

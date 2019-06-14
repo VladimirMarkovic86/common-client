@@ -68,13 +68,15 @@
    :qsort {:code 1}
    :pagination true
    :current-page 0
-   :rows cmle/rows
+   :rows (cmle/calculate-rows)
    :collation {:locale "sr"}})
 
 (defn table-conf-fn
   "Table configuration for language entity"
   []
-  {:query (query-fn)
+  {:preferences cmle/preferences
+   :query-fn query-fn
+   :query (query-fn)
    :columns (columns-fn)
    :form-conf (form-conf-fn)
    :actions [:details :edit :delete]
