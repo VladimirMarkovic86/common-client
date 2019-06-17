@@ -1,4 +1,4 @@
-(defproject org.clojars.vladimirmarkovic86/common-client "0.3.35"
+(defproject org.clojars.vladimirmarkovic86/common-client "0.3.36"
   :description "Common client"
   :url "https://github.com/VladimirMarkovic86/common-client"
   :license {:name "Eclipse Public License"
@@ -8,7 +8,7 @@
                  [org.clojars.vladimirmarkovic86/ajax-lib "0.1.11"]
                  [org.clojars.vladimirmarkovic86/htmlcss-lib "0.1.6"]
                  [org.clojars.vladimirmarkovic86/js-lib "0.1.15"]
-                 [org.clojars.vladimirmarkovic86/framework-lib "0.2.38"]
+                 [org.clojars.vladimirmarkovic86/framework-lib "0.2.39"]
                  [org.clojars.vladimirmarkovic86/utils-lib "0.4.9"]
                  [org.clojars.vladimirmarkovic86/client-test-lib "0.2.12"]
                  [org.clojars.vladimirmarkovic86/language-lib "0.2.30"]
