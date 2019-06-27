@@ -4,6 +4,57 @@
             [common-client.chat.controller :as cc]
             [language-lib.core :refer [get-label]]))
 
+(defn fill-chat-call-input-select
+  "Fills up chat call input select with available system audio inputs"
+  []
+  (let [media-devices (aget
+                        js/navigator
+                        "mediaDevices")
+        enumerate-devices-promise (.enumerateDevices
+                                    media-devices)]
+    (.then
+      enumerate-devices-promise
+      ((fn []
+         (fn [device-infos]
+           (doseq [device-info device-infos]
+             (let [device-info-kind (aget
+                                      device-info
+                                      "kind")
+                   audio-select (md/query-selector
+                                  "#chat-call-input")]
+               (when (= device-info-kind
+                        "audioinput")
+                 (let [device-label (aget
+                                      device-info
+                                      "label")
+                       option-label (if (or (nil?
+                                              device-label)
+                                            (empty?
+                                              device-label))
+                                      (str
+                                        "microphone "
+                                        (inc
+                                          (aget
+                                            audio-select
+                                            "length"))
+                                       )
+                                      device-label)
+                       option (gen
+                                (option
+                                  option-label
+                                  {:value (aget
+                                            device-info
+                                            "deviceId")})
+                               )]
+                   (md/append-element
+                     audio-select
+                     option))
+                ))
+            ))
+        ))
+   ))
+ )
+
 (defn chat-pure-html
   "Construct html chat view and append it"
   [logged-in-username]
@@ -55,28 +106,27 @@
                             {:class "btn"
                              :type "button"
                              :value (get-label 67)}
-                            {:onclick {:evt-fn cc/send-chat-message-ws}})]
+                            {:onclick {:evt-fn cc/send-chat-message-ws}})
+                          ]
                          {:class "chat-message"})
-                       #_(div
-                         [(input
-                            ""
-                            {:class "btn"
-                             :type "button"
-                             :value "Start streaming audio"}
-                            {:onclick {:evt-fn cc/start-streaming}})
+                       (div
+                         [(select
+                            nil
+                            {:id "chat-call-input"})
                           (input
                             ""
                             {:class "btn"
                              :type "button"
-                             :value "Stop streaming audio"}
-                            {:onclick {:evt-fn cc/stop-streaming}})
+                             :value (get-label 88)}
+                            {:onclick {:evt-fn cc/make-a-call-ws}})
                           ]
-                         {:class "audio-message"})
+                         {:class "chat-call"})
                        ]
                       {:class "chat"}))]
     (md/append-element
       ".content"
       chat-form)
+    (fill-chat-call-input-select)
     (cc/chat-ws-fn))
  )
 

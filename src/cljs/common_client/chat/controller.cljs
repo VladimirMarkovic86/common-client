@@ -1,5 +1,6 @@
 (ns common-client.chat.controller
   (:require [ajax-lib.core :refer [sjax get-response]]
+            [language-lib.core :refer [get-label]]
             [common-middle.request-urls :as rurls]
             [common-middle.ws-request-actions :as wsra]
             [htmlcss-lib.core :refer [gen div audio]]
@@ -14,6 +15,159 @@
 (def websocket-obj-a
      (atom nil))
 
+(def display-call-screen-a-fn
+     (atom nil))
+
+(def remove-call-screen-a-fn
+     (atom nil))
+
+(def start-streaming-a-fn
+     (atom nil))
+
+(def stop-streaming-a-fn
+     (atom nil))
+
+(def screen-type-calling
+     "calling")
+
+(def screen-type-answering
+     "answering")
+
+(def screen-type-connected
+     "connected")
+
+(defn get-selected-chat-contact
+  "Returns value of selected option in user select html element"
+  []
+  (when-let [selected-username-el (md/query-selector-on-element
+                                    ".chat"
+                                    "#chat-users")]
+    (let [selected-username (aget
+                              (aget
+                                (aget
+                                  selected-username-el
+                                  "selectedOptions")
+                                0)
+                              "value")]
+      selected-username))
+ )
+
+(defn accept-call-fn
+  "Accepts received call"
+  []
+  (@remove-call-screen-a-fn)
+  (@display-call-screen-a-fn
+    screen-type-connected)
+  (let [selected-username (get-selected-chat-contact)]
+    (when (and (not= selected-username
+                     @logged-in-username-a)
+               (not= selected-username
+                     "-1"))
+      (let [message {:action wsra/call-accepted-action
+                     :receiver selected-username
+                     :sender @logged-in-username-a}]
+        (.send
+          @websocket-obj-a
+          (str
+            message))
+       ))
+   )
+  (@start-streaming-a-fn))
+
+(defn hang-up-call-fn
+  "Hang up on a call or reject answering"
+  []
+  (@stop-streaming-a-fn)
+  (let [selected-username (get-selected-chat-contact)]
+    (when (and (not= selected-username
+                     @logged-in-username-a)
+               (not= selected-username
+                     "-1"))
+      (let [message {:action wsra/hang-up-call-action
+                     :receiver selected-username
+                     :sender @logged-in-username-a}]
+        (.send
+          @websocket-obj-a
+          (str
+            message))
+       ))
+   )
+  (@remove-call-screen-a-fn))
+
+(defn display-call-screen-fn
+  "Displays call screen"
+  [screen-type]
+  (let [call-screen-el (gen
+                         (div
+                           [(div
+                              nil
+                              {:class "call-background"})
+                            (div
+                              nil
+                              {:class "user-image default-user-img"})
+                            (div
+                              (get-selected-chat-contact)
+                              {:class "contact-name"})
+                            (div
+                              [(when (= screen-type
+                                        screen-type-answering)
+                                 (div
+                                   (div
+                                     nil
+                                     {:class "phone-img"})
+                                   {:class "phone-call"}
+                                   {:onclick {:evt-fn accept-call-fn}}))
+                               (div
+                                 (div
+                                   nil
+                                   {:class "phone-img"})
+                                 {:class "hang-up"}
+                                 {:onclick {:evt-fn hang-up-call-fn}})
+                               ]
+                              {:class "phone-action"})
+                            (div
+                              (let [call-label (atom "")]
+                                (when (= screen-type
+                                         screen-type-calling)
+                                  (reset!
+                                    call-label
+                                    (get-label 89))
+                                 )
+                                (when (= screen-type
+                                         screen-type-answering)
+                                  (reset!
+                                    call-label
+                                    (get-label 90))
+                                 )
+                                (when (= screen-type
+                                         screen-type-connected)
+                                  (reset!
+                                    call-label
+                                    (get-label 91))
+                                 )
+                                @call-label)
+                              {:class "call-label"})
+                            ]
+                           {:class "call-modal"}))]
+    (md/append-element
+      "body"
+      call-screen-el))
+ )
+
+(reset!
+  display-call-screen-a-fn
+  display-call-screen-fn)
+
+(defn remove-call-screen-fn
+  "Removes call screen"
+  []
+  (md/remove-element
+    ".call-modal"))
+
+(reset!
+  remove-call-screen-a-fn
+  remove-call-screen-fn)
+
 (defn scroll-chat-to-bottom
   "Scrolls chat content to bottom"
   []
@@ -23,8 +177,9 @@
     (aset
       chat-history-el
       "scrollTop"
-      (.-scrollTopMax
-        chat-history-el))
+      (aget
+        chat-history-el
+        "scrollTopMax"))
    ))
 
 (defn get-chat-users
@@ -50,20 +205,6 @@
                         users)]
     users-reduced))
 
-(defn get-selected-chat-contact
-  "Returns value of selected option in user select html element"
-  []
-  (when-let [selected-username-el (md/query-selector-on-element
-                                    ".chat"
-                                    "#chat-users")]
-    (let [selected-username (.-value
-                              (aget
-                                (.-selectedOptions
-                                  selected-username-el)
-                                0))]
-      selected-username))
- )
-
 (defn send-audio-chunk-ws
   "Sends audio chunk through websocket"
   [audio-chunk]
@@ -86,17 +227,34 @@
      ))
   )
 
+(defn make-a-call-ws
+  "Makes call to selected contact"
+  []
+  (let [selected-username (get-selected-chat-contact)]
+    (when (and (not= selected-username
+                     @logged-in-username-a)
+               (not= selected-username
+                     "-1"))
+      (let [message {:action wsra/make-a-call-action
+                     :receiver selected-username
+                     :sender @logged-in-username-a}]
+        (display-call-screen-fn
+          screen-type-calling)
+        (.send
+          @websocket-obj-a
+          (str
+            message))
+       ))
+   ))
+
 (def media-recorder-a
      (atom nil))
 
 (def recording-a
      (atom false))
 
-(def audio-el-a
-     (atom
-       (gen
-         (audio))
-      ))
+(def is-playing-a
+     (atom false))
 
 (def audio-chunks-a
      (atom []))
@@ -104,23 +262,68 @@
 (def current-index-a
      (atom 0))
 
+(def chunk-duration
+     (atom 200))
+
 (defn play-chunks-fn
   "Play chunks"
   []
-  (let [audio-chunk-el (get
-                         @audio-chunks-a
-                         @current-index-a)]
-    (when audio-chunk-el
-      (aset
-        @audio-el-a
-        "src"
-        audio-chunk-el)
-      (.play
-        @audio-el-a)
-      (swap!
-        current-index-a
-        inc))
-   ))
+  (when @is-playing-a
+    (let [audio-chunk-el (get
+                           @audio-chunks-a
+                           @current-index-a)]
+      (if audio-chunk-el
+        (let [audio-el (gen
+                         (audio))]
+          (aset
+            audio-el
+            "src"
+            audio-chunk-el)
+          (.play
+            audio-el)
+          (swap!
+            current-index-a
+            inc)
+          (md/timeout
+            #(play-chunks-fn)
+            @chunk-duration))
+        (md/timeout
+          #(play-chunks-fn)
+          @chunk-duration))
+     ))
+ )
+
+(defn make-chunks-fn
+  "Make chunks"
+  []
+  (when (and @recording-a
+             (not
+               (nil?
+                 @media-recorder-a))
+         )
+    (when-not (= (aget
+                   @media-recorder-a
+                   "state")
+                 "inactive")
+      (.stop
+        @media-recorder-a))
+    (.start
+      @media-recorder-a)
+    (js/setTimeout
+      #(make-chunks-fn)
+      @chunk-duration))
+  (when (and (not
+               @recording-a)
+             (not
+               (nil?
+                 @media-recorder-a))
+         )
+    (.stop
+      @media-recorder-a)
+    (reset!
+      media-recorder-a
+      nil))
+ )
 
 (defn initialize-media-recorder
   "Initialize media recorder"
@@ -130,25 +333,25 @@
     nil)
   (reset!
     recording-a
-    false)
-  (reset!
-    audio-el-a
-    (gen
-      (audio
-        ""
-        nil
-        {:onended {:evt-fn play-chunks-fn}}))
-   )
+    true)
   (reset!
     audio-chunks-a
     [])
   (reset!
     current-index-a
     0)
-  (let [media-devices (.-mediaDevices
-                        js/navigator)
+  (let [media-devices (aget
+                        js/navigator
+                        "mediaDevices")
+        selected-audio-input (md/get-value
+                               "#chat-call-input")
         audio-document (js-obj
-                         "audio" true)
+                         "audio"
+                           (js-obj
+                             "deviceId"
+                               (js-obj
+                                 "exact" selected-audio-input))
+                        )
         audio-promise (.getUserMedia
                         media-devices
                         audio-document)]
@@ -172,53 +375,48 @@
                                  ((fn []
                                     (fn [e]
                                       (send-audio-chunk-ws
-                                        (.-result
-                                          (.-target
-                                            e))
-                                       ))
-                                   ))
-                                )]
+                                        (aget
+                                          (aget
+                                            e
+                                            "target")
+                                          "result"))
+                                     ))
+                                  ))]
                     (.readAsDataURL
                       file-reader
-                      (.-data
-                        event))
+                      (aget
+                        event
+                        "data"))
                    ))
                ))
-            ))
+            )
+           (make-chunks-fn))
         ))
      ))
  )
 
-(defn make-chunks-fn
-  "Make chunks"
-  []
-  (when @recording-a
-    (.stop
-      @media-recorder-a)
-    (.start
-      @media-recorder-a)
-    (js/setTimeout
-      #(make-chunks-fn)
-      1000))
-  (when-not @recording-a
-    (.stop
-      @media-recorder-a))
- )
-
-(defn start-streaming
+(defn start-streaming-fn
   "Start streaming audio to selected username"
   []
-  (reset!
-    recording-a
-    true)
-  (make-chunks-fn))
+  (initialize-media-recorder))
 
-(defn stop-streaming
+(reset!
+  start-streaming-a-fn
+  start-streaming-fn)
+
+(defn stop-streaming-fn
   "Stop streaming audio to selected user"
   []
   (reset!
     recording-a
+    false)
+  (reset!
+    is-playing-a
     false))
+
+(reset!
+  stop-streaming-a-fn
+  stop-streaming-fn)
 
 (defn generate-chat-history
   "Generate html of chat history"
@@ -268,8 +466,7 @@
   "On every contact username change read
    chat history and initialize media recorder"
   []
-  (get-chat-history)
-  #_(initialize-media-recorder))
+  (get-chat-history))
 
 (defn send-chat-message-ws
   "Send chat message to contact"
@@ -320,8 +517,9 @@
   [evt-p
    element
    event]
-  (when (= (.-keyCode
-             event)
+  (when (= (aget
+             event
+             "keyCode")
            13)
     (send-chat-message-ws
       evt-p
@@ -355,8 +553,9 @@
 (defn establish-chat-connection-ws-fn
   "Onopen websocket event save reference to websocket object"
   [event]
-  (let [websocket-obj (.-target
-                        event)]
+  (let [websocket-obj (aget
+                        event
+                        "target")]
     (try
       (reset!
         websocket-obj-a
@@ -380,8 +579,9 @@
   "Onmessage websocket event receive message"
   [event]
   (let [response (reader/read-string
-                   (.-data
-                     event))
+                   (aget
+                     event
+                     "data"))
         action (:action response)]
     (when (= action
              wsra/receive-chat-message-action)
@@ -415,26 +615,77 @@
      )
     (when (= action
              wsra/receive-audio-chunk-action)
-      (let [{sender-username :sender
-             audio-chunk :audio-chunk} response]
-        (swap!
-          audio-chunks-a
-          conj
-          audio-chunk)
-        (play-chunks-fn))
+      (let [{audio-chunk :audio-chunk} response]
+        (if (< (count
+                 @audio-chunks-a)
+               200)
+          (swap!
+            audio-chunks-a
+            conj
+            audio-chunk)
+          (do
+            (reset!
+              audio-chunks-a
+              [])
+            (reset!
+              current-index-a
+              0)
+            (swap!
+              audio-chunks-a
+              conj
+              audio-chunk))
+         )
+        (when-not @is-playing-a
+          (reset!
+            is-playing-a
+            true)
+          (play-chunks-fn))
+       ))
+    (when (= action
+             wsra/receive-call-action)
+      (let [sender-name (:sender response)]
+        (if (= sender-name
+               (get-selected-chat-contact))
+          (do
+            (remove-call-screen-fn)
+            (display-call-screen-fn
+              screen-type-answering))
+          (when (and (not= sender-name
+                           @logged-in-username-a)
+                     (not= sender-name
+                           "-1"))
+            (let [message {:action wsra/unavailable-action
+                           :receiver sender-name
+                           :sender @logged-in-username-a}]
+              (.send
+                @websocket-obj-a
+                (str
+                  message))
+             ))
+         ))
      )
     (when (= action
-             "incoming-call")
-      ;Implement answer functionality
-     ))
- )
+             wsra/call-accepted-action)
+      (remove-call-screen-fn)
+      (display-call-screen-fn
+        screen-type-connected)
+      (start-streaming-fn))
+    (when (= action
+             wsra/hang-up-call-action)
+      (stop-streaming-fn)
+      (remove-call-screen-fn))
+    (when (= action
+             wsra/unavailable-action)
+      (remove-call-screen-fn))
+   ))
 
 (defn websocket-default-close
   "Default close of websocket"
   [event]
   (let [response (reader/read-string
-                   (.-reason
-                     event))
+                   (aget
+                     event
+                     "reason"))
         action (:action response)]
     (when (= action
              wsra/rejected-action)
