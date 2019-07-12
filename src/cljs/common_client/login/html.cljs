@@ -15,6 +15,9 @@
             [common-client.allowed-actions.controller :refer [allowed-actions]]
             [common-middle.functionalities :as fns]))
 
+(def display-forgot-password-a
+     (atom true))
+
 (defn form-fn
   "Generate table HTML element that contains login form"
   [login-evt
@@ -54,14 +57,16 @@
                   :type "checkbox"
                   :title (get-label 16)})
                (span)])
-            (div
-              (label
-                (a
-                  (get-label 76)
-                  {:id "forgotPasswordId"
-                   :title (get-label 76)}
-                  forgot-password-evt))
-              {:style {:margin-bottom "27px"}})])
+            (when @display-forgot-password-a
+              (div
+                (label
+                  (a
+                    (get-label 76)
+                    {:id "forgotPasswordId"
+                     :title (get-label 76)}
+                    forgot-password-evt))
+                {:style {:margin-bottom "27px"}}))
+            ])
          (div
            [(input
               ""
