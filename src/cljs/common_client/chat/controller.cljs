@@ -3,14 +3,12 @@
             [language-lib.core :refer [get-label]]
             [common-middle.request-urls :as rurls]
             [common-middle.ws-request-actions :as wsra]
+            [common-middle.session :as cms]
             [htmlcss-lib.core :refer [gen div audio]]
             [js-lib.core :as md]
             [clojure.string :as cstring]
             [cljs.reader :as reader]
             [websocket-lib.core :refer [websocket]]))
-
-(def logged-in-username-a
-     (atom nil))
 
 (def websocket-obj-a
      (atom nil))
@@ -60,12 +58,12 @@
     screen-type-connected)
   (let [selected-username (get-selected-chat-contact)]
     (when (and (not= selected-username
-                     @logged-in-username-a)
+                     (:username @cms/logged-in-user))
                (not= selected-username
                      "-1"))
       (let [message {:action wsra/call-accepted-action
                      :receiver selected-username
-                     :sender @logged-in-username-a}]
+                     :sender (:username @cms/logged-in-user)}]
         (.send
           @websocket-obj-a
           (str
@@ -80,12 +78,12 @@
   (@stop-streaming-a-fn)
   (let [selected-username (get-selected-chat-contact)]
     (when (and (not= selected-username
-                     @logged-in-username-a)
+                     (:username @cms/logged-in-user))
                (not= selected-username
                      "-1"))
       (let [message {:action wsra/hang-up-call-action
                      :receiver selected-username
-                     :sender @logged-in-username-a}]
+                     :sender (:username @cms/logged-in-user)}]
         (.send
           @websocket-obj-a
           (str
@@ -194,7 +192,7 @@
                         (fn [acc
                              elem]
                           (let [username (:username elem)]
-                            (if-not (= @logged-in-username-a
+                            (if-not (= (:username @cms/logged-in-user)
                                        username)
                               (conj
                                 acc
@@ -210,14 +208,14 @@
   [audio-chunk]
   (let [selected-username (get-selected-chat-contact)]
     (when (and (not= selected-username
-                     @logged-in-username-a)
+                     (:username @cms/logged-in-user))
                (not= selected-username
                      "-1"))
       (when-not (cstring/blank?
                   audio-chunk)
         (let [message {:action wsra/send-audio-chunk-action
                        :receiver selected-username
-                       :sender @logged-in-username-a
+                       :sender (:username @cms/logged-in-user)
                        :audio-chunk audio-chunk}]
           (.send
             @websocket-obj-a
@@ -232,12 +230,12 @@
   []
   (let [selected-username (get-selected-chat-contact)]
     (when (and (not= selected-username
-                     @logged-in-username-a)
+                     (:username @cms/logged-in-user))
                (not= selected-username
                      "-1"))
       (let [message {:action wsra/make-a-call-action
                      :receiver selected-username
-                     :sender @logged-in-username-a}]
+                     :sender (:username @cms/logged-in-user)}]
         (display-call-screen-fn
           screen-type-calling)
         (.send
@@ -433,11 +431,11 @@
           (div
             text
             {:class (if (= username
-                           @logged-in-username-a)
+                           (:username @cms/logged-in-user))
                       "my-message"
                       "contacts-message")})
           {:class (if (= username
-                         @logged-in-username-a)
+                         (:username @cms/logged-in-user))
                     "my-message-container"
                     "contacts-message-container")})
        ))
@@ -451,9 +449,9 @@
   []
   (let [selected-username (get-selected-chat-contact)]
     (when (not= selected-username
-                @logged-in-username-a)
+                (:username @cms/logged-in-user))
       (let [message {:action wsra/get-chat-history-action
-                     :usernames [@logged-in-username-a
+                     :usernames [(:username @cms/logged-in-user)
                                  selected-username]}]
         (.send
           @websocket-obj-a
@@ -475,7 +473,7 @@
    event]
   (let [selected-username (get-selected-chat-contact)]
     (when (and (not= selected-username
-                     @logged-in-username-a)
+                     (:username @cms/logged-in-user))
                (not= selected-username
                      "-1"))
       (let [text-message-el (md/query-selector-on-element
@@ -486,9 +484,9 @@
         (when-not (cstring/blank?
                     text-message)
           (let [message {:action wsra/send-chat-message-action
-                         :usernames [@logged-in-username-a
+                         :usernames [(:username @cms/logged-in-user)
                                      selected-username]
-                         :message {:username @logged-in-username-a
+                         :message {:username (:username @cms/logged-in-user)
                                    :text text-message}}
                 html-message-el (gen
                                   (div
@@ -531,7 +529,7 @@
   "Closes websocket connection with server"
   []
   (let [message {:action wsra/close-connection-action
-                 :username @logged-in-username-a}]
+                 :username (:username @cms/logged-in-user)}]
     (.send
       @websocket-obj-a
       (str
@@ -561,7 +559,7 @@
         websocket-obj-a
         websocket-obj)
       (let [message {:action wsra/establish-connection-action
-                     :username @logged-in-username-a}]
+                     :username (:username @cms/logged-in-user)}]
         (.send
           @websocket-obj-a
           (str
@@ -651,12 +649,12 @@
             (display-call-screen-fn
               screen-type-answering))
           (when (and (not= sender-name
-                           @logged-in-username-a)
+                           (:username @cms/logged-in-user))
                      (not= sender-name
                            "-1"))
             (let [message {:action wsra/unavailable-action
                            :receiver sender-name
-                           :sender @logged-in-username-a}]
+                           :sender (:username @cms/logged-in-user)}]
               (.send
                 @websocket-obj-a
                 (str

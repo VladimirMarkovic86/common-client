@@ -6,12 +6,11 @@
 
 (defn nav
   "Returns map of menu item and it's sub items"
-  [logged-in-username]
+  []
   (when (contains?
           @allowed-actions
           fns/chat)
     {:label (get-label 68)
      :id "chat-nav-id"
-     :evt-fn cv/chat-pure-html
-     :evt-p logged-in-username}))
+     :evt-fn cv/chat-pure-html}))
 

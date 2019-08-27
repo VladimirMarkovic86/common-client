@@ -57,10 +57,7 @@
 
 (defn chat-pure-html
   "Construct html chat view and append it"
-  [logged-in-username]
-  (reset!
-    cc/logged-in-username-a
-    logged-in-username)
+  []
   (md/remove-element-content
     ".content")
   (let [users (cc/get-chat-users)

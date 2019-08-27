@@ -10,6 +10,7 @@
             [common-client.role.html :as rh]
             [common-client.language.html :as lh]
             [common-client.chat.html :as ch]
+            [common-client.calendar.html :as calh]
             [common-client.preferences.html :as ccph]
             [language-lib.core :refer [get-label]]
             [common-client.allowed-actions.controller :refer [allowed-actions]]
@@ -189,8 +190,8 @@
   (apply
     conj
     custom-menu
-    [(ch/nav
-       logged-in-username)
+    [(calh/nav)
+     (ch/nav)
      (when (or (contains?
                  @allowed-actions
                  fns/user-create)

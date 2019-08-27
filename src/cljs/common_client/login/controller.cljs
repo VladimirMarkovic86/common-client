@@ -24,9 +24,6 @@
 (def logout-success-fn
      (atom nil))
 
-(def logged-in-user
-     (atom nil))
-
 (defn remove-main
   "Remove main page from HTML document"
   []
@@ -95,7 +92,7 @@
         language-name (atom "")
         language-icon (atom "")]
     (reset!
-      logged-in-user
+      cms/logged-in-user
       {:username username})
     (when (= language-changed-to
              "english")
@@ -131,7 +128,7 @@
         @language-icon
         @custom-menu
         @home-page-content
-        (:username @logged-in-user)))
+        (:username @cms/logged-in-user)))
    ))
 
 (defn login-success
